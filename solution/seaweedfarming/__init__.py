@@ -15,7 +15,7 @@ import sys
 # import useful things -- see bottomtrawling/init for list
 #sys.path.append("C:\\Users\\neilm\\Documents\\Drawdown\\code\\solutions")
 
-from model import advanced_controls
+from model import advanced_controls as ac
 
 
 import pathlib
@@ -55,44 +55,54 @@ THISDIR = pathlib.Path(__file__).parents[0]
 VMAs = {
     'Current Adoption': vma.VMA(
         filename=THISDIR.joinpath("vma_data","Current_Adoption.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'SOLUTION First Cost per Implementation Unit': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "SOLUTION_First_Cost_per_Implementation_Unit.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'SOLUTION Operating Cost per Functional Unit per Annum': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "SOLUTION_Operating_Cost_per_Functional_Unit_per_Annum.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'SOLUTION Net Profit Margin per Functional Unit per Annum': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "SOLUTION_Net_Profit_Margin_per_Functional_Unit_per_Annum.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'Sequestration Rate': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "Sequestration_Rate.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'Carbon Content Dry Biomass': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "Carbon_Content_Dry_Biomass.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'Wet Dry Conversion': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "Wet_Dry_Conversion.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'Farm Biomass Export': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "Farm_Biomass_Export.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'Long Term Sequestration Rate': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "Long_Term_Sequestration_Rate.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
     'Yield Dry Weight': vma.VMA(
         filename=THISDIR.joinpath("vma_data", "Yield_Dry_Weight.csv"),
-        use_weight=False),
+        use_weight=False, stat_correction=False),
 }
 
 
 
+# First row of sequestration rate 
+# = (M324/(1-$T$299))*$T$299*$T$266*$T$313
+# = M324*$T$299*$T$266*$T$313/(1-$T$299)
+# = yield_dry_weight* Farm_biomass_export*Carbon_content_dry_biomass*Long_term_sequestration_rate/(1-Farm_biomass_export) -< all averages
 
+# first step to build a factor out of all the averages:
 
-print(VMAs)
+avg_farm_bio_exp = VMAs['Farm Biomass Export'].avg_high_low(key='mean')
+avg_carb_dry_bio = VMAs['Carbon Content Dry Biomass'].avg_high_low(key='mean')
+avg_long_term_seq = VMAs['Long Term Sequestration Rate'].avg_high_low(key='mean')
+avg_yield_dry_weight = VMAs['Yield Dry Weight'].avg_high_low(key='mean')
+seq_rate = avg_yield_dry_weight* avg_farm_bio_exp * avg_carb_dry_bio * avg_long_term_seq / (1-avg_farm_bio_exp)
 
+#print(seq_rate)
 
-
+solution_category = ac.SOLUTION_CATEGORY.Ocean
 
 # create a list of valid scenario objects
 # -- make csvs from excel model
