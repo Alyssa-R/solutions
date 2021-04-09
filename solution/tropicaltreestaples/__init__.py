@@ -24,7 +24,7 @@ from model import vma
 from model import tla
 from solution import land
 
-DATADIR = pathlib.Path(__file__).parents[2].joinpath('da ta')
+DATADIR = pathlib.Path(__file__).parents[2].joinpath('data')
 THISDIR = pathlib.Path(__file__).parents[0]
 VMAs = {
     'Current Adoption': vma.VMA(
